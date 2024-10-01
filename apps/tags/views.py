@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models.query import QuerySet
 from django.views.generic import ListView,CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
@@ -5,44 +6,41 @@ from django.urls import reverse_lazy
 from apps.tags.models import Tag
 from apps.tags.forms import TagForm
 
-class TagListView(ListView):
+class TagListView(LoginRequiredMixin, PermissionRequiredMixin,ListView):
     template_name= 'tags/list.html'
     context_object_name = 'tag_list'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['name'] = 'Tag'
-        return context
-
-    def get_queryset(self):
-        queryset = Tag.objects.all()
-        return queryset
 
 
 
-class TagCreateView(CreateView):
+
+
+class TagCreateView(LoginRequiredMixin, PermissionRequiredMixin,CreateView):
     model = Tag
     template_name = 'tags/form.html'
-    form_class = TagForm
-    success_url = reverse_lazy('tag_list')
+    context_object_name = 'tags'
+    login_url ='accounts:login'
+    raise_exception =True
 
-    def form_valid(self, form):
-        return super().form_valid(form)
 
-class TagUpdateView(UpdateView):
+class TagUpdateView(LoginRequiredMixin, PermissionRequiredMixin,UpdateView):
     model = Tag
     form_class = TagForm
     template_name = "tags/form.html"
-    success_url = reverse_lazy('tag_list')
+    success_url = reverse_lazy('tags:list')
+    permission_required = 'tags.change_tag'
+    login_url ='accounts:login'
+    raise_exception =True
 
-    def form_valid(self, form):
-        return super().form_valid(form)
 
 
-class TagDeleteView(DeleteView):
+
+class TagDeleteView(LoginRequiredMixin, PermissionRequiredMixin,DeleteView):
     model = Tag
     template_name = None
     success_url = reverse_lazy('tag_list')
+    permission_required = 'tags.delete_tag'
+    login_url = 'accounts:login'
+    raise_exception = True
 
-    def get(self, request, *args, **kwargs):
-        return self.post(request, *args, **kwargs)
+
