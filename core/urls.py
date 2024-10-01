@@ -23,9 +23,10 @@ from apps.accounts import urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', LoginView.as_view(), name = 'home'),
     path('accounts/', include('apps.accounts.urls', namespace= 'accounts')),
     path('category/', include('apps.category.urls', namespace= 'category')),
     path('tags/', include('apps.tags.urls', namespace='news')),
     path('news/', include('apps.news.urls', namespace = 'tags')),
-   path('', RedirectView.as_view(url=reverse_lazy('accounts:login'), permanent = False), name = 'home'),
+   
 ]
